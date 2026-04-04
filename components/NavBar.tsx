@@ -2,49 +2,58 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
 
 export default function NavBar() {
   const pathname = usePathname()
-  const [dueCount, setDueCount] = useState<number | null>(null)
 
-  useEffect(() => {
-    fetch('/api/vocab')
-      .then(r => r.json())
-      .then((vocab: { next_review: string }[]) => {
-        const now  = new Date()
-        const due  = vocab.filter(v => new Date(v.next_review) <= now).length
-        setDueCount(due)
-      })
-      .catch(() => {})
-  }, [pathname])
-
-  const navLink = (href: string, label: string, badge?: number | null) => {
-    const active = pathname === href
+  const navLink = (href: string, label: string) => {
+    const active = pathname === href || (href !== '/' && pathname.startsWith(href))
     return (
       <Link
         href={href}
         className={`
-          relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium
-          transition-colors duration-150
+          px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150
           ${active
             ? 'bg-vermilion/10 text-vermilion'
             : 'text-paper/70 hover:text-paper hover:bg-white/10'}
         `}
       >
         {label}
-        {badge != null && badge > 0 && (
-          <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full bg-vermilion text-white leading-none">
-            {badge > 99 ? '99+' : badge}
-          </span>
-        )}
+      </Link>
+    )
+  }
+
+  const reviewLink = (href: string, label: string) => {
+    const active = pathname === href || pathname.startsWith(href)
+    return (
+      <Link
+        href={href}
+        className={`
+          px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150
+          border
+          ${active
+            ? 'border-gold/60 text-gold bg-gold/10'
+            : 'border-gold/20 text-gold/60 hover:border-gold/50 hover:text-gold hover:bg-gold/10'}
+        `}
+      >
+        {label}
       </Link>
     )
   }
 
   return (
-    <nav className="bg-navy shadow-md">
-      <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+    <nav className="relative bg-navy shadow-md overflow-hidden">
+      {/* Background image — anchored left-centre, slight leftward offset */}
+      <div
+        className="pointer-events-none absolute inset-0 -left-16"
+        style={{
+          backgroundImage:    'url(/nav-bg.svg)',
+          backgroundRepeat:   'no-repeat',
+          backgroundPosition: 'left center',
+          backgroundSize:     'auto 100%',
+        }}
+      />
+      <div className="relative max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
@@ -58,10 +67,11 @@ export default function NavBar() {
         </Link>
 
         {/* Links */}
-        <div className="flex items-center gap-1">
-          {navLink('/',       'Library')}
-          {navLink('/add',    'Add Word')}
-          {navLink('/review', 'Review', dueCount)}
+        <div className="flex items-center gap-2">
+          {navLink('/', 'Library')}
+          <span className="text-paper/20">|</span>
+          {reviewLink('/review',  'Meaning')}
+          {reviewLink('/reading', 'Reading')}
         </div>
 
       </div>

@@ -29,16 +29,6 @@ function VocabRow({
   entry:    VocabEntry
   onDelete: (id: string) => void
 }) {
-  const due     = new Date(entry.next_review) <= new Date()
-  const daysStr = (() => {
-    const diff = Math.ceil(
-      (new Date(entry.next_review).getTime() - Date.now()) / 86_400_000
-    )
-    if (diff <= 0)  return 'due now'
-    if (diff === 1) return 'tomorrow'
-    return `in ${diff}d`
-  })()
-
   return (
     <tr className="group border-b border-gold/10 hover:bg-gold/5 transition-colors">
       <td className="pl-5 py-3 pr-4 border-l border-gold/15">
@@ -48,15 +38,6 @@ function VocabRow({
         <span className="font-jp text-sm text-muted">{entry.reading}</span>
       </td>
       <td className="py-3 pr-4 text-sm">{entry.english}</td>
-      <td className="py-3 pr-4 text-xs text-muted whitespace-nowrap">
-        <span className={`
-          inline-block px-2 py-0.5 rounded-full
-          ${due ? 'bg-vermilion/10 text-vermilion font-medium' : 'bg-gold/10 text-gold'}
-        `}>
-          {daysStr}
-        </span>
-      </td>
-      <td className="py-3 text-xs text-muted">{entry.repetitions}×</td>
       <td className="py-3 pl-2 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
           onClick={() => onDelete(entry.id)}
@@ -133,9 +114,8 @@ export default function HomePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <Stat label="Total words"    value={vocab.length} />
-        <Stat label="Due for review" value={due.length} accent={due.length > 0} />
         <Stat label="Mastered (7d+)" value={vocab.filter(v => v.interval >= 7).length} />
       </div>
 
@@ -185,8 +165,6 @@ export default function HomePage() {
                   </th>
                   <th className="text-left pr-4 py-3 font-medium">Reading</th>
                   <th className="text-left pr-4 py-3 font-medium">Meaning</th>
-                  <th className="text-left pr-4 py-3 font-medium">Next review</th>
-                  <th className="text-left py-3 font-medium">Reps</th>
                   <th className="py-3" />
                 </tr>
               </thead>

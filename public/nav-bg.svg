@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="56" viewBox="0 0 600 56">
+  <!-- Soft Japanese seigaiha (青海波) wave circles, low opacity -->
+  <defs>
+    <radialGradient id="wave" cx="50%" cy="100%" r="50%">
+      <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Row 1 -->
+  <circle cx="0"   cy="56" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="1"/>
+  <circle cx="48"  cy="56" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="1"/>
+  <circle cx="96"  cy="56" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="1"/>
+  <circle cx="144" cy="56" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="1"/>
+  <circle cx="192" cy="56" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="1"/>
+  <circle cx="240" cy="56" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="1"/>
+  <circle cx="288" cy="56" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.08" stroke-width="1"/>
+  <circle cx="336" cy="56" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.05" stroke-width="1"/>
+
+  <!-- Row 2 (offset) -->
+  <circle cx="24"  cy="12" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.08" stroke-width="1"/>
+  <circle cx="72"  cy="12" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.10" stroke-width="1"/>
+  <circle cx="120" cy="12" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.10" stroke-width="1"/>
+  <circle cx="168" cy="12" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.08" stroke-width="1"/>
+  <circle cx="216" cy="12" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.06" stroke-width="1"/>
+  <circle cx="264" cy="12" r="48" fill="none" stroke="#c9a84c" stroke-opacity="0.04" stroke-width="1"/>
+
+
+</svg>
