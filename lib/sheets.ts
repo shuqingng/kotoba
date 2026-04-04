@@ -141,8 +141,8 @@ export async function deleteVocab(id: string): Promise<void> {
   const sheet = meta.data.sheets?.find(
     s => s.properties?.title === SHEET_NAME
   )
-  if (!sheet?.properties?.sheetId == null) throw new Error('Sheet not found')
-  const sheetId = sheet.properties!.sheetId!
+  const sheetId = sheet?.properties?.sheetId
+  if (sheetId == null) throw new Error('Sheet not found')
 
   // Find row
   const colARes = await sheets.spreadsheets.values.get({
