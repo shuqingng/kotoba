@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Root variables ───────────────────────────────────────────────────────── */
+:root {
+  --color-paper:     #f5f0e8;
+  --color-ink:       #1e1b18;
+  --color-navy:      #1a1f3a;
+  --color-vermilion: #c9414a;
+  --color-gold:      #c9a84c;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+html {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+}
+
+body {
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Japanese text ────────────────────────────────────────────────────────── */
+.font-jp {
+  font-family: var(--font-noto-jp), 'Noto Sans JP', sans-serif;
+}
+
+/* ── Flashcard flip ───────────────────────────────────────────────────────── */
+.perspective {
+  perspective: 1200px;
+}
+
+.card-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c9a84c55; border-radius: 3px; }
+
+/* ── Selection ────────────────────────────────────────────────────────────── */
+::selection { background: #c9414a22; }
