@@ -120,27 +120,30 @@ export default function ReadingReviewPage() {
   const current   = queue[0]
   const remaining = queue.length
 
-  const handleRate = useCallback(async (quality: ReviewQuality) => {
+  const handleRate = useCallback((quality: ReviewQuality) => {
     if (!current || submitting) return
     setSubmitting(true)
-    try {
-      await fetch(`/api/reading/review/${current.id}`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ quality }),
-      })
-      setReviewed(n => n + 1)
-      setFlipped(false)
-      const next = queue.slice(1)
+
+    // Update UI immediately — no waiting on the network
+    setReviewed(n => n + 1)
+    setFlipped(false)
+    const next = queue.slice(1)
+    setTimeout(() => {
       if (quality === 'again') {
         setQueue([...next, current])
       } else {
         setQueue(next)
         if (next.length === 0) setDone(true)
       }
-    } finally {
       setSubmitting(false)
-    }
+    }, 260)
+
+    // Save in background — fire and forget
+    fetch(`/api/reading/review/${current.id}`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ quality }),
+    }).catch(err => console.error('[reading review]', err))
   }, [current, queue, submitting])
 
   useEffect(() => {
