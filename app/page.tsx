@@ -41,7 +41,7 @@ function VocabRow({
 
   return (
     <tr className="group border-b border-gold/10 hover:bg-gold/5 transition-colors">
-      <td className="py-3 pr-4">
+      <td className="pl-5 py-3 pr-4 border-l border-gold/15">
         <span className="font-jp text-xl text-navy">{entry.japanese}</span>
       </td>
       <td className="py-3 pr-4">
@@ -180,7 +180,9 @@ export default function HomePage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gold/10 text-xs text-muted uppercase tracking-wider">
-                  <th className="text-left px-5 py-3 font-medium">Word</th>
+                  <th className="text-left pl-5 pr-4 py-3 font-medium border-l border-gold/15">
+                    Word
+                  </th>
                   <th className="text-left pr-4 py-3 font-medium">Reading</th>
                   <th className="text-left pr-4 py-3 font-medium">Meaning</th>
                   <th className="text-left pr-4 py-3 font-medium">Next review</th>
