@@ -23,12 +23,74 @@ const SHEET_NAME = 'Vocab'
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
+function stripBom(s: string): string {
+  return s.charCodeAt(0) === 0xfeff ? s.slice(1) : s
+}
+
+/** PEM from env vars often has literal `\n`, wrapping quotes, or a BOM — OpenSSL fails to decode otherwise. */
+function normalizePrivateKey(raw: string | undefined): string {
+  if (raw == null || raw === '') return ''
+  let k = stripBom(raw).trim()
+  if (
+    (k.startsWith('"') && k.endsWith('"')) ||
+    (k.startsWith("'") && k.endsWith("'"))
+  ) {
+    k = k.slice(1, -1).trim()
+  }
+  return k.replace(/\\n/g, '\n')
+}
+
+function getGoogleServiceCredentials(): {
+  client_email: string
+  private_key: string
+} {
+  const jsonRaw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim()
+  if (jsonRaw) {
+    let parsed: { client_email?: string; private_key?: string }
+    try {
+      parsed = JSON.parse(stripBom(jsonRaw)) as {
+        client_email?: string
+        private_key?: string
+      }
+    } catch {
+      throw new Error(
+        'GOOGLE_SERVICE_ACCOUNT_JSON is not valid JSON (paste the full downloaded service account file).'
+      )
+    }
+    const email = parsed.client_email?.trim()
+    const key = normalizePrivateKey(parsed.private_key)
+    if (!email || !key) {
+      throw new Error(
+        'GOOGLE_SERVICE_ACCOUNT_JSON must include client_email and private_key.'
+      )
+    }
+    if (!key.includes('BEGIN') || !key.includes('PRIVATE KEY')) {
+      throw new Error(
+        'Service account private_key is not a valid PEM (check the JSON was pasted completely).'
+      )
+    }
+    return { client_email: email, private_key: key }
+  }
+
+  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.trim()
+  const key = normalizePrivateKey(process.env.GOOGLE_PRIVATE_KEY)
+  if (!email || !key) {
+    throw new Error(
+      'Set GOOGLE_SERVICE_ACCOUNT_JSON or both GOOGLE_SERVICE_ACCOUNT_EMAIL and GOOGLE_PRIVATE_KEY.'
+    )
+  }
+  if (!key.includes('BEGIN') || !key.includes('PRIVATE KEY')) {
+    throw new Error(
+      'GOOGLE_PRIVATE_KEY must be a PEM. Use real newlines, or \\n escapes, or switch to GOOGLE_SERVICE_ACCOUNT_JSON.'
+    )
+  }
+  return { client_email: email, private_key: key }
+}
+
 function getSheetsClient() {
+  const { client_email, private_key } = getGoogleServiceCredentials()
   const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      private_key:  process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    },
+    credentials: { client_email, private_key },
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   })
   return google.sheets({ version: 'v4', auth })
