@@ -135,6 +135,7 @@ export async function addReadingCard(
     ease_factor: 2.5,
     repetitions: 0,
     language:    detectScript(data.reading),
+    locked:      false,
   }
   const sheets = getSheetsClient()
   await sheets.spreadsheets.values.append({
