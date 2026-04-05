@@ -15,6 +15,20 @@ function FlashCard({
   flipped: boolean
   onClick: () => void
 }) {
+  const [showReading, setShowReading] = useState(false)
+
+  // Reset reading visibility when card changes
+  useEffect(() => { setShowReading(false) }, [entry])
+
+  // 'r' to reveal reading while on the front
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!flipped && e.key === 'r') setShowReading(true)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [flipped])
+
   return (
     <div
       className="perspective w-full cursor-pointer select-none"
@@ -33,7 +47,15 @@ function FlashCard({
             {entry.japanese}
           </span>
           {entry.reading && (
-            <span className="font-jp text-lg text-muted">{entry.reading}</span>
+            showReading
+              ? <span className="font-jp text-lg text-muted animate-fade-in">{entry.reading}</span>
+              : <button
+                  onClick={e => { e.stopPropagation(); setShowReading(true) }}
+                  className="text-xs text-muted/50 hover:text-muted border border-muted/20 hover:border-muted/40
+                             rounded-lg px-3 py-1 transition-colors"
+                >
+                  show reading <span className="opacity-50">(r)</span>
+                </button>
           )}
           <span className="mt-4 text-xs text-muted/50">tap to reveal →</span>
         </div>
