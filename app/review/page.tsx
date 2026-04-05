@@ -10,10 +10,12 @@ function FlashCard({
   entry,
   flipped,
   onClick,
+  onSpeak,
 }: {
-  entry:   VocabEntry
-  flipped: boolean
-  onClick: () => void
+  entry:    VocabEntry
+  flipped:  boolean
+  onClick:  () => void
+  onSpeak:  () => void
 }) {
   const [showReading, setShowReading] = useState(false)
 
@@ -43,6 +45,16 @@ function FlashCard({
         <div className="card-face bg-white rounded-2xl border border-gold/20 shadow-card
                         flex flex-col items-center justify-center p-8 gap-4">
           <span className="text-xs uppercase tracking-widest text-muted">What does this mean?</span>
+          <button
+            onClick={e => { e.stopPropagation(); onSpeak() }}
+            className="text-muted/30 hover:text-muted transition-colors"
+            aria-label="Repeat pronunciation"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+              <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 0 0 1.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06ZM18.584 5.106a.75.75 0 0 1 1.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 0 1-1.06-1.06 8.25 8.25 0 0 0 0-11.668.75.75 0 0 1 0-1.06Z" />
+              <path d="M15.932 7.757a.75.75 0 0 1 1.061 0 6 6 0 0 1 0 8.486.75.75 0 0 1-1.06-1.061 4.5 4.5 0 0 0 0-6.364.75.75 0 0 1 0-1.06Z" />
+            </svg>
+          </button>
           <span className="font-jp text-6xl text-navy font-medium leading-tight text-center">
             {entry.japanese}
           </span>
@@ -57,7 +69,7 @@ function FlashCard({
                   show reading <span className="opacity-50">(r)</span>
                 </button>
           )}
-          <span className="mt-4 text-xs text-muted/50">tap to reveal →</span>
+          <span className="text-xs text-muted/50">tap to reveal →</span>
         </div>
 
         {/* Back – English */}
@@ -145,6 +157,26 @@ export default function ReviewPage() {
   const current = queue[0]
   const remaining = queue.length
 
+  // Speak the Japanese word
+  const speak = useCallback((text: string) => {
+    const utter = new SpeechSynthesisUtterance(text)
+    utter.lang = 'ja-JP'
+    window.speechSynthesis.cancel()
+    window.speechSynthesis.speak(utter)
+  }, [])
+
+  // Auto-speak on new card
+  useEffect(() => {
+    if (current?.japanese) speak(current.japanese)
+  }, [current?.id])
+
+  // 'p' to repeat pronunciation
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'p' && current?.japanese) speak(current.japanese) }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [current?.japanese, speak])
+
   const handleRate = useCallback((quality: ReviewQuality) => {
     if (!current || submitting) return
     setSubmitting(true)
@@ -226,7 +258,7 @@ export default function ReviewPage() {
       </div>
 
       {/* Card */}
-      <FlashCard entry={current} flipped={flipped} onClick={() => setFlipped(f => !f)} />
+      <FlashCard entry={current} flipped={flipped} onClick={() => setFlipped(f => !f)} onSpeak={() => speak(current.japanese)} />
 
       {/* Rating buttons */}
       <div className={`transition-opacity duration-300 ${flipped ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>

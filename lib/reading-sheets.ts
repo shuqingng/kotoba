@@ -14,13 +14,14 @@ export interface ReadingCard {
   ease_factor: number
   repetitions: number
   language:    ReadingScript // column I — 'hiragana' | 'katakana' | ''
+  locked:      boolean       // column J — true = not yet learnt, hide from review
 }
 
 // ─── Sheet layout ─────────────────────────────────────────────────────────────
 // Tab: "ReadingReview"
 // Row 1 = headers:
 //   A=id  B=japanese  C=reading  D=english  E=next_review
-//   F=interval  G=ease_factor  H=repetitions  I=language
+//   F=interval  G=ease_factor  H=repetitions  I=language  J=locked
 
 const SHEET_NAME = 'ReadingReview'
 
@@ -95,6 +96,7 @@ function rowToCard(row: string[]): ReadingCard {
     ease_factor: Number(row[6]) || 2.5,
     repetitions: Number(row[7]) || 0,
     language:    (row[8] ?? '') as ReadingScript,
+    locked:      (row[9] ?? '').toLowerCase() === 'true',
   }
 }
 
@@ -112,11 +114,12 @@ export async function getAllReadingCards(): Promise<ReadingCard[]> {
   const sheets = getSheetsClient()
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: sid(),
-    range:         `${SHEET_NAME}!A2:I`,
+    range:         `${SHEET_NAME}!A2:J`,
   })
   return ((res.data.values ?? []) as string[][])
     .filter(r => r[0])
     .map(rowToCard)
+    .filter(c => !c.locked)
 }
 
 export async function addReadingCard(
